@@ -28,7 +28,7 @@ BE WARNED! Code is messy for now. It should look better after next update.
 * Fixes input for 2 digit numbers.
 * Initial losing screen.
 * More convenient input system.
-* + Background work to make next additions/fixes easier to implement.
+* \+ Background work to make next additions/fixes easier to implement.
 
 ##### Version 1:
 
