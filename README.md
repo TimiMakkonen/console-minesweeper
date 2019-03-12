@@ -21,6 +21,15 @@ BE WARNED! Code is messy for now. It should look better after next update.
 
 ### Version History:
 
+##### Version 3:
+
+* Slightly improved readability of the code.
+* Started to deal with proper handling of wrong inputs.
+* Added initial win screen and win condition, if you manage to mark all mines.
+* Ability to unmark grid spots by marking them again (in case you made a mistake).
+* Initial options/special input menu implemented.
+
+
 ##### Version 2:
 
 * Fixed some visual mistakes and made the game look prettier 
@@ -28,13 +37,14 @@ BE WARNED! Code is messy for now. It should look better after next update.
 * Fixes input for 2 digit numbers.
 * Initial losing screen.
 * More convenient input system.
-* + Background work to make next additions/fixes easier to implement.
+* \+ Background work to make next additions/fixes easier to implement.
 
 ##### Version 1:
 
 
 Initial version of the game. Mostly in working condition.
 
+---
 
 ### Fixes and features left to implement:
 
