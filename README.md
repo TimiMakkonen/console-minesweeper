@@ -4,7 +4,7 @@ The purpose of this program is to see/show/test if I can program a minesweeper g
 
 ---
 
-### Note
+### Note:
 
 I have made sure not to look up codes of any other minesweeper programs prior making this program. Hence this program and the methods used in it to make it work are all mostly 'original'.
 Throughout making this program, I have only googled some methods, good practices, algorithms and syntax to make things work the way I want them to.
