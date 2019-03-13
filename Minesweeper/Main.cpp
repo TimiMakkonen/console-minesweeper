@@ -26,8 +26,6 @@ const char NotChosenSymbol = ' ';
 
 
 
-
-
 //--------------------------------------------------------------------------------
 //									Declarations:
 //--------------------------------------------------------------------------------
@@ -37,7 +35,8 @@ const char NotChosenSymbol = ' ';
 
 
 
-
+// random generator function to use with std::random_shuffle
+int MyRandomGen(int i);
 
 // to print row of a grid
 void PrintRow(vector< vector<char> > &VisibleGrid, int GridSize, int RowNumber);
@@ -52,10 +51,13 @@ void PrintCharRow(int GridSize);
 void PrintGrid(vector< vector<char> > &VisibleGrid, int GridSize);
 
 // to create the data grid with mines
-void CreateGrid(vector< vector<int> > &Grid, int GridSize, int NumberOfMines);
+void CreateGrid(vector< vector<int> > &Grid, int GridSize, int NumberOfMines, int(&ChosenCoordinates)[2]);
 
-// to transfer input string of coordinates into coordinates for the program
-void InputToCoordinates(string ChosenSpot, int(&ChosenCoordinates)[2], bool &MarkInput);
+// to transfer input string of coordinates into coordinates for the program (return false if not able to do this)
+bool TryInputToCoordinates(string ChosenSpot, int(&ChosenCoordinates)[2], bool &MarkInput);
+
+// to transfer intepreted coordinates back to input letters (to let user know, what the program thought they meant)
+string Coordinate0ToLetters(int ChosenCoordinate0);
 
 // to check user given coordinates, and update result
 void CheckInputCoordinates(vector< vector<int> > &Grid, vector< vector<char> > &VisibleGrid, int ChosenCoordinate0, int ChosenCoordinate1);
@@ -70,7 +72,7 @@ void MarkInputCoordinates(int GridSpotToDataForMark, vector< vector<char> > &Vis
 void Solution(vector< vector<int> > Grid, int GridSize);
 
 // to check for special input options: solution, quit and help
-int CheckForOptions(vector< vector<int> > &Grid, int GridSize, string Input);
+int CheckForOptions(vector< vector<int> > &Grid, int GridSize, string Input, bool GridHasBeenCreated);
 
 
 
@@ -90,156 +92,247 @@ int CheckForOptions(vector< vector<int> > &Grid, int GridSize, string Input);
 
 int main() {
 
-	// Welcome text
-	cout << "Welcome to basic Minesweeper game!" << endl;
-	cout << "First of all, choose desired grid size: (I recommend 10.) " << endl;
+	// to set random seed
+	srand(time(NULL));
 
 
-	// Maximum Grid Size
-	int MaximumGridSize = 26;
+
+	// variable to determine if you want to play again
+	bool PlayAgain = false;
+
+	do {
+
+		// Welcome text
+		cout << "Welcome to basic Minesweeper game!" << endl;
+		cout << "This program does NOT provide you with the rules of Minesweeper." << endl;
+		cout << "To find out the rules of Minesweeper, you can rely on the information available online." << endl << endl;
+		cout << "Good luck and have fun!" << endl << endl;
+		cout << "First of all, choose desired grid size: (I recommend '10' => 10x10 grid) " << endl;
 
 
-	// Input grid size
-	string GridSizeStr;
-	bool ValidSizeInput = false;
-	int GridSize = 0;
-	while (!ValidSizeInput) {
-		try {
-			getline(cin,GridSizeStr);
-			GridSize = stoi(GridSizeStr); // if input (GridSizeStr) is not a number, throws exception
-			if (GridSize > MaximumGridSize || GridSize <= 0) {
-				cout << "Too small or large number! Choose again: (Choose a whole number between 1 and " << MaximumGridSize << " )" << endl;
+		// Maximum Grid Size
+		int MaximumGridSize = 99;
+
+
+		// Input grid size
+		string GridSizeStr;
+		bool ValidSizeInput = false;
+		int GridSize = 0;
+		while (!ValidSizeInput) {
+			try {
+				getline(cin, GridSizeStr);
+				GridSize = stoi(GridSizeStr); // if input (GridSizeStr) is not a number, throws exception
+				if (GridSize > MaximumGridSize || GridSize <= 0) {
+					cout << "Too small or large number! Choose again: (Choose a whole number between 1 and " << MaximumGridSize << ". I recommend number <50. )" << endl;
+				}
+				else {
+					ValidSizeInput = true;
+				}
 			}
-			else {
-				ValidSizeInput = true;
-			}
-		}
-		catch (...) {
-			cout << "Not a number! Please try to enter the grid size again: " << endl;
-		}
-	}
-	
-
-	cout << "Perfect! Now choose the number of mines: " << endl;
-
-
-	// Input number of mines
-	string NumberOfMinesStr;
-	bool ValidNumOfMinesInput = false;
-	int NumberOfMines = 0;
-	while (!ValidNumOfMinesInput) {
-		try {
-			getline(cin, NumberOfMinesStr);
-			NumberOfMines = stoi(NumberOfMinesStr); // if input (NumberOfMinesStr) is not a number, throws exception
-			if (NumberOfMines >= GridSize * GridSize || NumberOfMines <= 0) {
-				cout << "Too many or not enough mines! Choose again: (Choose a whole number between 1 and " << GridSize * GridSize - 1 << " )" << endl;
-			}
-			else {
-				ValidNumOfMinesInput = true;
+			catch (...) {
+				cout << "Not a number! Please try to enter the grid size again: " << endl;
 			}
 		}
-		catch (...) {
-			cout << "Not a number! Please try enter the number of mines again: " << endl;
-		}
-	}
 
 
-
-	// declare and initialise grid with 0's
-	vector< vector<int> > Grid(GridSize, vector<int>(GridSize, 0));
-	CreateGrid(Grid, GridSize, NumberOfMines);
+		cout << "Perfect! Now choose the number of mines: " << endl;
 
 
-	// to declare and initialise visible grid
-	vector< vector<char> > VisibleGrid(GridSize, vector<char>(GridSize, NotChosenSymbol));
-
-
-
-
-	// solution for bugging purposes
-	//Solution(Grid, GridSize);
-	
-
-
-	// The Start Of The Game Itself
-	cout << endl << "Splendid! Enjoy your game!" << endl;
-	string ChosenSpot;
-	bool MarkInput;
-	int ChosenCoordinates[2] = {0, 0};
-	int NumberOfMarkedMines = 0;
-	int NumberOfWronglyMarkedMines = 0;
-	int WhatAfterOptions = 0;
-	while (true) {
-
-		PrintGrid(VisibleGrid, GridSize);
-
-		cout << "Choose a grid spot to mark or check." << endl;
-		cout << "To check type: 'A5', 'B2, etc." << endl;
-		cout << "To mark type: 'A2 M', 'C6 M', etc." << endl;
-		cout << "These inputs are NOT case NOR space sensitive. For example 'b3m' also marks B3." << endl;
-		getline(cin, ChosenSpot);
-
-		// to check if we got a special instruction
-		WhatAfterOptions = CheckForOptions(Grid, GridSize, ChosenSpot);
-		if (WhatAfterOptions == 1) {
-			continue;
-		}
-		else if (WhatAfterOptions == -1) {
-			break;
-		}
-		else {
-
-		}
-
-	
-		// Checking which spot user picked and if they want to check or mark it
-		MarkInput = false;
-		InputToCoordinates(ChosenSpot, ChosenCoordinates, MarkInput);
-
-
-		// to check that the intepreted gridspot exists
-		while (ChosenCoordinates[0] < 0 || ChosenCoordinates[0] > GridSize - 1 || ChosenCoordinates[1] < 0 || ChosenCoordinates[1] > GridSize - 1) {
-			cout << "INVALID INPUT! Choose a grid spot again to mark or check" << endl;
-			getline(cin, ChosenSpot);
-			InputToCoordinates(ChosenSpot, ChosenCoordinates, MarkInput);
+		// Input number of mines
+		string NumberOfMinesStr;
+		bool ValidNumOfMinesInput = false;
+		int NumberOfMines = 0;
+		while (!ValidNumOfMinesInput) {
+			try {
+				getline(cin, NumberOfMinesStr);
+				NumberOfMines = stoi(NumberOfMinesStr); // if input (NumberOfMinesStr) is not a number, throws exception
+				if (NumberOfMines > GridSize * GridSize - 9 || NumberOfMines <= 0) {
+					cout << "Too many or not enough mines! Choose again: (Choose a whole number between 1 and " << GridSize * GridSize - 9 << " )" << endl;
+				}
+				else {
+					ValidNumOfMinesInput = true;
+				}
+			}
+			catch (...) {
+				cout << "Not a number! Please try enter the number of mines again: " << endl;
+			}
 		}
 
 
+
+
+
+
+
+
+		// variable to determine if you want to play again with the same rules
+		bool PlayAgainSameRules = false;
+
+		do {
+
+			// declare and initialise grid with 0's
+			vector< vector<int> > Grid(GridSize, vector<int>(GridSize, 0));
+
+
+			// to declare and initialise visible grid
+			vector< vector<char> > VisibleGrid(GridSize, vector<char>(GridSize, NotChosenSymbol));
+
+
+
+
+
+			// The Start Of The Game Itself
+			cout << endl << "Splendid! Enjoy your game!" << endl;
+			string ChosenSpot;
+			bool GridHasBeenCreated = false;
+			bool ShowGrid = true;
+			bool ShowDefaultInputQ = true;
+			bool ShowHelp = true;
+			bool MarkInput;
+			int ChosenCoordinates[2] = { 0, 0 };
+			int NumberOfMarkedMines = 0;
+			int NumberOfWronglyMarkedMines = 0;
+			int WhatAfterOptions = 0;
+			int GameTimeout = 0;
+			while (GameTimeout <= GridSize * GridSize + 100) {
+
+				if (ShowGrid) {
+					PrintGrid(VisibleGrid, GridSize);
+				}
+				ShowGrid = false;
+
+				if (ShowDefaultInputQ) {
+					cout << "Choose a grid spot to mark or check: ";
+					if (ShowHelp) {
+						cout << "\n\nTo check type: 'A5', 'B2, etc." << endl;
+						cout << "To mark type: 'A2 M', 'C6 M', etc." << endl;
+						cout << "These inputs are NOT case NOR space sensitive. For example 'b3m' also marks B3." << endl;
+						cout << "You can type 'QUIT' to quit the game or 'SOL' to see the solution." << endl;
+						cout << "You can type 'HELP' to see this message again." << endl;
+					}
+					else {
+						cout << "(Type 'HELP' for instructions.)" << endl;
+					}
+				}
+				ShowDefaultInputQ = true;
+				ShowHelp = false;
+
+				getline(cin, ChosenSpot);
+
+				// to check if we got a special instruction
+				// -1: QUIT, 1:SOLUTION, 2:HELP
+				WhatAfterOptions = CheckForOptions(Grid, GridSize, ChosenSpot, GridHasBeenCreated);
+				if (WhatAfterOptions == 1) {
+					ShowGrid = true;
+					continue;
+				}
+				else if (WhatAfterOptions == 2) {
+					ShowHelp = true;
+					cout << endl;
+					continue;
+				}
+				else if (WhatAfterOptions == -1) {
+					break;
+				}
+				else {
+
+				}
+
+
+				// Checking which spot user picked and if they want to check or mark it
+				MarkInput = false; // MarkInput will change to true if user wants to (un)mark
+				if (!TryInputToCoordinates(ChosenSpot, ChosenCoordinates, MarkInput)) {
+					cout << "Please try to choose a grid spot again to mark or check: (Type 'HELP' for instructions.)" << endl;
+					ShowDefaultInputQ = false;
+					continue;
+				}
+
+
+				// to check that the intepreted gridspot exists (is withing range)
+				if (ChosenCoordinates[0] < 0 || ChosenCoordinates[0] > GridSize - 1 || ChosenCoordinates[1] < 0 || ChosenCoordinates[1] > GridSize - 1) {
+					cout << "Chosen coordinates out of range! Please choose a grid spot again to mark or check: (Type 'HELP' for instructions.)" << endl;
+					ShowDefaultInputQ = false;
+					continue;
+				}
+
+
+
+
+
+
+
+				// create the grid after user has chosen the first grid spot to guarantee a good start
+				if (!GridHasBeenCreated) {
+					CreateGrid(Grid, GridSize, NumberOfMines, ChosenCoordinates);
+					GridHasBeenCreated = true;
+				}
+
+
+
+
+
+
+
+
+				// to update visible grid by checking or (un)marking
+				if (!MarkInput) {
+					CheckInputCoordinates(Grid, VisibleGrid, ChosenCoordinates[0], ChosenCoordinates[1]);
+
+					PrintGrid(VisibleGrid, GridSize);
+
+					cout << "You chose to check: " << Coordinate0ToLetters(ChosenCoordinates[0]) << ' ' << ChosenCoordinates[1] + 1 << endl << endl;
+					if (VisibleGrid[ChosenCoordinates[1]][ChosenCoordinates[0]] == MineSymbol) {
+						cout << "\n\n**********You Lost!**********\n\n";
+						cout << "\nPress ENTER to see the solution..." << std::flush;
+						cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+						Solution(Grid, GridSize);
+						cout << "\n\n**********You Lost!**********\n\n";
+						break;
+					}
+				}
+				else {
+					int GridSpotToDataForMark = Grid[ChosenCoordinates[1]][ChosenCoordinates[0]];
+					MarkInputCoordinates(GridSpotToDataForMark, VisibleGrid, ChosenCoordinates, NumberOfMarkedMines, NumberOfWronglyMarkedMines);
+
+					PrintGrid(VisibleGrid, GridSize);
+
+					cout << "You chose to mark: " << Coordinate0ToLetters(ChosenCoordinates[0]) << ' ' << ChosenCoordinates[1] + 1 << endl << endl;
+					// Win condition
+					if (NumberOfMarkedMines == NumberOfMines && NumberOfWronglyMarkedMines == 0) {
+						cout << "\n\n**********You Won!**********\n\n";
+						cout << "\nPress ENTER to see the solution..." << std::flush;
+						cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+						Solution(Grid, GridSize);
+						cout << "\n\n**********You Won!**********\n\n";
+						break;
+					}
+				}
+				GameTimeout++;
+			}
+
+
+
+			cout << "Thank you for playing!" << endl;
+			cout << "Would you like to play again? (Y/N)" << endl;
+			string PlayAgainStr;
+			getline(cin, PlayAgainStr);
+			cout << endl;
+			if (PlayAgainStr == "Y" || PlayAgainStr == "y" || PlayAgainStr == "1" || PlayAgainStr == "Yes" || PlayAgainStr == "YES" || PlayAgainStr == "yes") {
 		
-		// to update visible grid by checking or (un)marking
-		if (!MarkInput) {
-			CheckInputCoordinates(Grid, VisibleGrid, ChosenCoordinates[0], ChosenCoordinates[1]);
-			if (VisibleGrid[ChosenCoordinates[1]][ChosenCoordinates[0]] == MineSymbol) {
-				cout << "\n\n**********You Lost!**********\n\n";
-				Solution(Grid, GridSize);
-				cout << "\n\n**********You Lost!**********\n\n";
-				break;
+				cout << "Would you like to use the same rule set? (Size of the grid: " << GridSize << 'x' << GridSize << " and the number of mines: " << NumberOfMines << ") (Y/N)" << endl;
+				string SameRuleSet;
+				getline(cin, SameRuleSet);
+				cout << "------------------------------------------" << endl;
+				if (SameRuleSet == "Y" || SameRuleSet == "y" || SameRuleSet == "1" || SameRuleSet == "Yes" || SameRuleSet == "YES" || SameRuleSet == "yes") {
+					PlayAgainSameRules = true;
+				}
+				else {
+					PlayAgain = true;
+				}
 			}
-		}
-		else {
-			int GridSpotToDataForMark = Grid[ChosenCoordinates[1]][ChosenCoordinates[0]];
-			MarkInputCoordinates(GridSpotToDataForMark, VisibleGrid, ChosenCoordinates, NumberOfMarkedMines, NumberOfWronglyMarkedMines);
-			
+		} while (PlayAgainSameRules);
 
-			// Win condition
-			if (NumberOfMarkedMines == NumberOfMines && NumberOfWronglyMarkedMines == 0) {
-				cout << "\n\n**********You Won!**********\n\n";				
-			}
-		}
-	}
-	
-
-
-	cout << "Thank you for playing!" << endl;
-	cout << "Would you like to play again? (Y/N)" << endl;
-	string PlayAgainStr;
-	getline(cin, PlayAgainStr);
-	if (PlayAgainStr == "Y" || PlayAgainStr == "y" || PlayAgainStr == "1" || PlayAgainStr == "Yes" || PlayAgainStr == "YES" || PlayAgainStr == "yes") {
-		cout << "This option is not available yet." << endl;
-		//PlayMinesweeperGame();
-	}
-
-
+	} while (PlayAgain);
 
 	cout << "Good bye!" << endl;
 	cin.get();
@@ -261,6 +354,11 @@ int main() {
 
 
 
+
+
+
+// random generator function to use with std::random_shuffle
+int MyRandomGen(int i) { return std::rand() % i; }
 
 
 
@@ -291,10 +389,28 @@ void PrintLineRow(int GridSize) {
 
 // to print letters above a grid
 void PrintCharRow(int GridSize) {
+	// standard print for grids with size<27
 	cout << "    ";
-	for (int i = 0; i < GridSize; i++) {
-		cout << "  " << char(65 + i) << ' ';
+	if (GridSize <= 26) {
+		for (int i = 0; i < GridSize; i++) {
+			cout << "  " << char(65 + i) << ' ';
+		}
 	}
+	// print for grids size >=27
+	if (GridSize > 26 && GridSize <= 675) {
+		for (int i = 0; i < 26; i++) {
+			cout << "  " << char(65 + i) << ' ';
+		}
+		int CharNumbOfLastEntry = GridSize / 26 - 1;
+		for (int i = 0; i < CharNumbOfLastEntry; i++) {
+			for (int j = 0; j < 26; j++)
+			cout << "  " << char(65 + i) << char(65 + j);
+		}
+		for (int i = 0; i < GridSize % 26; i++) {
+			cout << "  " << char(65 + CharNumbOfLastEntry) << char(65 + i);
+		}
+	}
+
 	cout << ' ' << endl;
 }
 
@@ -313,20 +429,69 @@ void PrintGrid(vector< vector<char> > &VisibleGrid, int GridSize) {
 	cout << endl;
 }
 
+
+
+
 // to create the data grid with mines
-void CreateGrid(vector< vector<int> > &Grid, int GridSize, int NumberOfMines) {
+void CreateGrid(vector< vector<int> > &Grid, int GridSize, int NumberOfMines, int(&ChosenCoordinates)[2]) {
+
+	
+	// to create a vector with values: 0, 1, 2, ..., GridSize*GridSize - 1
+	vector<int> GoodGridSpots;
+	for (int i = 0; i < GridSize*GridSize; i++) GoodGridSpots.push_back(i);
 
 
-	srand(time(NULL));
+
+	// to shuffle this vector
+	std::random_shuffle(GoodGridSpots.begin(), GoodGridSpots.end(), MyRandomGen);
+
+
+
+	// to remove bad gridspots (those on and around chosen initial spot)
+	GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+		(ChosenCoordinates[1] * GridSize + ChosenCoordinates[0])), GoodGridSpots.end());
+	if (ChosenCoordinates[0] > 0) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			(ChosenCoordinates[1] * GridSize + ChosenCoordinates[0] - 1)), GoodGridSpots.end());	//left
+	}
+	if (ChosenCoordinates[0] < GridSize - 1) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			(ChosenCoordinates[1] * GridSize + ChosenCoordinates[0] + 1)), GoodGridSpots.end());	// right
+	}
+	if (ChosenCoordinates[1] > 0) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] - 1) * GridSize + ChosenCoordinates[0])), GoodGridSpots.end());	// top
+	}
+	if (ChosenCoordinates[1] < GridSize - 1) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] + 1) * GridSize + ChosenCoordinates[0])), GoodGridSpots.end());	// bottom
+	}
+	if (ChosenCoordinates[1] > 0 && ChosenCoordinates[0] > 0) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] - 1) * GridSize + ChosenCoordinates[0] - 1)), GoodGridSpots.end());	// top left
+	}
+	if (ChosenCoordinates[1] > 0 && ChosenCoordinates[0] < GridSize - 1) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] - 1) * GridSize + ChosenCoordinates[0] + 1)), GoodGridSpots.end());	// top right
+	}
+	if (ChosenCoordinates[1] < GridSize - 1 && ChosenCoordinates[0] > 0) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] + 1) * GridSize + ChosenCoordinates[0] - 1)), GoodGridSpots.end());	// bottom left
+	}
+	if (ChosenCoordinates[1] < GridSize - 1 && ChosenCoordinates[0] < GridSize - 1) {
+		GoodGridSpots.erase(std::remove(GoodGridSpots.begin(), GoodGridSpots.end(), 
+			((ChosenCoordinates[1] + 1) * GridSize + ChosenCoordinates[0] + 1)), GoodGridSpots.end());	// bottom right
+	}
+
+
+	// creation of the mines and hints using GoodGridSpots
 	int MineX, MineY;
 	for (int i = 0; i < NumberOfMines; i++) {
 
 		// to create mines on the grid
-		do {
-			MineX = rand() % GridSize;
-			MineY = rand() % GridSize;
-		} while (Grid[MineY][MineX] == 9);
-		
+		MineX = GoodGridSpots[i] % GridSize;
+		MineY = GoodGridSpots[i] / GridSize;
+
 		Grid[MineY][MineX] = 9;
 
 		// to create "hints" around a mine
@@ -355,16 +520,20 @@ void CreateGrid(vector< vector<int> > &Grid, int GridSize, int NumberOfMines) {
 			Grid[MineY + 1][MineX + 1]++;	// bottom right
 		}
 	}
-
 }
 
 
 
 
-// to transfer input string of coordinates into coordinates for the program
-// THIS FUNCTION IN NEED OF MODIFYING! (WORK IN PROGRESS)
-void InputToCoordinates(string ChosenSpot, int (&ChosenCoordinates)[2], bool &MarkInput) {
+// to transfer input string of coordinates into coordinates for the program (return false if not able to do this)
+bool TryInputToCoordinates(string ChosenSpot, int (&ChosenCoordinates)[2], bool &MarkInput) {
+
+	int ChosenSpotLength = ChosenSpot.length();
+
+
+	// to capitalise input
 	transform(ChosenSpot.begin(), ChosenSpot.end(), ChosenSpot.begin(), ::toupper);
+
 
 	// to remove spaces
 	while (ChosenSpot.find(' ') != string::npos) {
@@ -372,53 +541,84 @@ void InputToCoordinates(string ChosenSpot, int (&ChosenCoordinates)[2], bool &Ma
 	}
 
 
-	// to find when letters turn into numbers
-	unsigned int i = 0;
-	if (int(ChosenSpot[i]) <= 65 && int(ChosenSpot[i]) >= 90) {
-		cerr << "Input Error: First character not a letter." << endl;
+	// to make sure first character is a letter
+	int i = 0;
+	if (int(ChosenSpot[i]) < 65 || int(ChosenSpot[i]) > 90) {
+		cout << "\nFirst character not a letter!" << endl;
+		return false;
 	}
+
+	// to find when letters turn into numbers
 	while (int(ChosenSpot[i]) >= 65 && int(ChosenSpot[i]) <= 90) {
 		i++;
+		// to make sure input doesn't have only letters (hence options should be checked before this function)
+		if (ChosenSpotLength == i) {
+			cout << "\nIncorrect input! (input contained only letters, no numbers)" << endl;
+			return false;
+		}
+	}
+
+	int IndexOfFirstNumber = i; // first non-letter (should be a number)
+	if (int(ChosenSpot[IndexOfFirstNumber]) < 48 || int(ChosenSpot[IndexOfFirstNumber]) > 57) {
+		cout << "\nFirst non-character not a number!" << endl;
+		return false;
 	}
 
 	
-	int IndexOfFirstNumber = i; // first non-letter (should be a number)
-	// First letter(s) to coordinate
+	// Letter(s) to find the first coordinate
 	if (IndexOfFirstNumber == 1) {
 		ChosenCoordinates[0] = int(ChosenSpot[0]) - 65;
 	}
-	else if (IndexOfFirstNumber == 2) {
-		ChosenCoordinates[0] = int(ChosenSpot[0]) - 65 + int(ChosenSpot[0] - 65); // to be added double character columns
+	else if (IndexOfFirstNumber == 2 ) {
+		ChosenCoordinates[0] = (int(ChosenSpot[0]) - 64) * 26 + (int(ChosenSpot[1]) - 65);
 	}
 	else {
-		cerr << "Input Error in 'Letters' of 'InputToCoordinates'" << endl;
+		cout << "\nCoordinate corresponding to the given column letters too large!" << endl;
+		return false;
 	}
 
+	
 	// to find when numbers stop
-	if (int(ChosenSpot[i]) <= 48 || int(ChosenSpot[i]) >= 57) {
-		cerr << "Input Error: First non-letter not a number." << endl;
-	}
 	while (int(ChosenSpot[i]) >= 48 && int(ChosenSpot[i]) <= 57) {
 		i++;
+		// to make sure we don't try to access non-existent position
+		if (ChosenSpotLength == i) break;
 	}
 
-	// Numbers to second coordinate
+
+	// Numbers to find the second coordinate
 	int IndexOfLastNumber = i - 1;
-	if (IndexOfLastNumber - IndexOfFirstNumber == 0) {
-		ChosenCoordinates[1] = int(ChosenSpot[IndexOfFirstNumber]) - 49;
-	}
-	else if (IndexOfLastNumber - IndexOfFirstNumber == 1) {
-		ChosenCoordinates[1] = stoi( ChosenSpot.substr(IndexOfFirstNumber, 2) ) - 1;
-	}
-	else {
-		cerr << "Input Error in 'Numbers' of 'InputToCoordinates'" << endl;
-	}
+	ChosenCoordinates[1] = stoi(ChosenSpot.substr(IndexOfFirstNumber, IndexOfLastNumber - IndexOfFirstNumber + 1)) - 1;
+
 
 	// index of M is 'i', if it exists
-	if (ChosenSpot.length() - 1 >= i) {
+	if (ChosenSpotLength - 1 >= i) {
 		if (ChosenSpot[i] == 'M') {
 			MarkInput = true;
 		}
+	}
+	return true;
+}
+
+
+
+
+// to transfer intepreted coordinates back to input letters (to let user know, what the program thought they meant)
+string Coordinate0ToLetters(int ChosenCoordinate0) {
+	if (ChosenCoordinate0 <= 25) {
+		string CoordinateToLetter = "A";
+		CoordinateToLetter = (ChosenCoordinate0 + 65);
+		return CoordinateToLetter;
+	}
+	else if (ChosenCoordinate0 > 25 && ChosenCoordinate0 < 675) {
+		string CoordinateToLetter = "AA";
+		CoordinateToLetter[0] = char((ChosenCoordinate0 / 26) + 64 );
+		CoordinateToLetter[1] = char((ChosenCoordinate0 % 26) + 65);
+		return CoordinateToLetter;
+	}
+	else {
+		cerr << "ERROR: Coordinate to Letters conversion failed!" << endl;
+		return "ERROR";
 	}
 }
 
@@ -579,21 +779,32 @@ void Solution(vector< vector<int> > Grid, int GridSize) {
 
 
 // to check for special input options: solution, quit and help
-int CheckForOptions(vector< vector<int> > &Grid, int GridSize, string Input) {
+int CheckForOptions(vector< vector<int> > &Grid, int GridSize, string Input, bool GridHasBeenCreated) {
 	transform(Input.begin(), Input.end(), Input.begin(), ::toupper);
 
 	// quit program and give solution, if user asks for it
 	if (Input == "QUIT" || Input == "Q") {
 		cout << "\nI am sorry that you have to leave." << endl;
-		Solution(Grid, GridSize);
+		if (GridHasBeenCreated) Solution(Grid, GridSize);
 		cout << endl;
 		return -1;
 	}
 
+	if (Input == "HELP" || Input == "H" || Input == "INFO" || Input == "INSTRUCTIONS" || Input == "I") {
+		return 2;
+	}
+
 
 	// solution given, if user asks for it
-	if (Input == "SOLUTION" || Input == "SOL") {
-		Solution(Grid, GridSize);
+	if (Input == "SOLUTION" || Input == "SOL" || Input == "S") {
+		if (GridHasBeenCreated) {
+			Solution(Grid, GridSize);
+		}
+		else {
+			cout << "\nThe grid will be created after the first move. Hence solution does not exist, yet." << endl;
+			cout << "\nPress ENTER to continue..." << std::flush;
+			cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+		}
 		cout << endl;
 		return 1;
 	}
