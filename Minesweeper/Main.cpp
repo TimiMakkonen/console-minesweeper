@@ -202,17 +202,17 @@ int main() {
 				ShowGrid = false;
 
 				if (ShowDefaultInputQ) {
-					cout << "Choose a grid spot to mark or check: ";
 					if (ShowHelp) {
-						cout << "\n\nTo check type: 'A5', 'B2, etc." << endl;
-						cout << "To mark type: 'A2 M', 'C6 M', etc." << endl;
-						cout << "These inputs are NOT case NOR space sensitive. For example 'b3m' also marks B3." << endl;
+						cout << "\n\nTo check a grid spot type: 'A5', 'B2, etc." << endl;
+						cout << "To mark a grid spot, type: 'A2 M', 'C6 M', etc." << endl;
+						cout << "These inputs are NOT case NOR space sensitive. For example typing 'b3m' also marks B3." << endl;
 						cout << "You can type 'QUIT' to quit the game or 'SOL' to see the solution." << endl;
 						cout << "You can type 'HELP' to see this message again." << endl;
 					}
 					else {
 						cout << "(Type 'HELP' for instructions.)" << endl;
 					}
+					cout << "Choose a grid spot to mark or check:" << endl;
 				}
 				ShowDefaultInputQ = true;
 				ShowHelp = false;
