@@ -13,14 +13,15 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Screenshots:
 
+
 #### Random gameplay example:  
 ![Random gameplay example](/Screenshots/MinesweeperCapture1.JPG "Random example")
 
-#### Example of progress after first move:
-![Example of progress after first move](/Screenshots/MinesweeperCapture2.JPG?raw=true "Example of first move")
-
 #### Start of a game:
 ![Start of a game](/Screenshots/MinesweeperCapture3.JPG?raw=true "Start of a game")
+
+#### Example of progress after first move:
+![Example of progress after first move](/Screenshots/MinesweeperCapture2.JPG?raw=true "Example of first move")
 
 #### New game options:
 ![New game options](/Screenshots/MinesweeperCapture4.JPG?raw=true "New game")
