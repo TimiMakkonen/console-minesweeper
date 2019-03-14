@@ -11,6 +11,22 @@ Throughout making this program, I have only googled some methods, good practices
 
 ---
 
+### Screenshots:
+
+#### Random Example:  
+![Random example](/Screenshots/MinesweeperCapture1.JPG "Random example")
+
+#### Example of first move:
+![Example of first move](/Screenshots/MinesweeperCapture2.JPG?raw=true "Example of first move")
+
+#### Start of a game:
+![Start of a game](/Screenshots/MinesweeperCapture3.JPG?raw=true "Start of a game")
+
+#### New game options:
+![New game options](/Screenshots/MinesweeperCapture4.JPG?raw=true "New game")
+
+---
+
 ### Version History:
 
 
