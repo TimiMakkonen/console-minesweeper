@@ -13,8 +13,8 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Screenshots:
 
-#### Random Example:  
-![Random example](/Screenshots/MinesweeperCapture1.JPG "Random example")
+#### Random gameplay example:  
+![Random gameplay example](/Screenshots/MinesweeperCapture1.JPG "Random example")
 
 #### Example of progress after first move:
 ![Example of progress after first move](/Screenshots/MinesweeperCapture2.JPG?raw=true "Example of first move")
