@@ -30,7 +30,7 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
-#### Version 5;
+#### Version 5:
 
 * Updated program from C-style to OOP.
 	* New 'Game', 'Grid' and 'Cell' classes.
