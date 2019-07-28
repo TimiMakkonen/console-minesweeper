@@ -30,6 +30,13 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
+#### Version 5;
+
+* Updated program from C-style to OOP.
+	* New 'Game', 'Grid' and 'Cell' classes.
+* Improved readability and efficiency of some parts of code.
+	* Changed variable naming convention from pascal to camel and made names easier to understand.
+* Changed pseudo-random number generator from 'rand' to 'std::mt19937' (Mersenne Twister 19937) to improve randomness.
 
 #### Version 4:
 
