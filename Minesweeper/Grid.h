@@ -23,6 +23,7 @@ private:
 	int numOfMines;
 	int numOfMarkedMines = 0;
 	int numOfWronglyMarkedMines = 0;
+	int numOfVisibleCells = 0;
 	std::vector< std::vector< std::unique_ptr<Cell> > > cells;
 
 
@@ -62,6 +63,8 @@ public:
 	void markInputCoordinates(const int X, const int Y);
 
 	bool allMinesMarked() const;
+
+	bool allNonMinesVisible() const;
 
 };
 

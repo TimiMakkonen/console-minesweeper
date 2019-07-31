@@ -30,6 +30,12 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
+#### Version 5.1:
+
+* Added win condition (all non mines visible/checked).
+* Made impossible to mark a cell on the first turn.
+* Slightly improved readability of the code.
+
 #### Version 5:
 
 * Updated program from C-style to OOP.
@@ -89,4 +95,6 @@ Initial version of the game. Mostly in working condition.
 * Improve HELP menu.
 * Edit input system overall.
 * Add an option to add mines by percentage, not by quantity.
+* Add an option to choose between 'normal' and 'condensed' grid.
+* Change solution screen. (Does not properly work with large grids atm.)
 

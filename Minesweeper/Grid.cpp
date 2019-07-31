@@ -248,11 +248,12 @@ void Grid::printCharRow() const {
 // to print out the solution 
 //	* condensed layout
 //	* should probably be redone
-//	* might not work with large grids
+//	* does not properly work with large grids (for now)
 void Grid::printSolution() const {
 
 	std::cout << "\nHere is the solution:\n" << std::endl;
 
+	// to print letters above solution grid
 	std::cout << std::setw(5);
 	for (int i = 0; i < this->gridSize; ++i) {
 		std::cout << ' ' << char(65 + i);
@@ -335,6 +336,16 @@ bool Grid::allMinesMarked() const {
 	}
 }
 
+bool Grid::allNonMinesVisible() const {
+
+	if (this->numOfVisibleCells == this->gridSize * this->gridSize - this->numOfMines) {
+		return true;
+	}
+	else {
+		return false;
+	}
+}
+
 
 
 // to check user given coordinates, and make it visible
@@ -346,6 +357,7 @@ bool Grid::checkInputCoordinates(const int X, const int Y) {
 	}
 	else if (!(this->cells[Y][X]->isVisible()) && !(this->cells[Y][X]->isMarked())) {
 		this->cells[Y][X]->makeVisible();
+		++(this->numOfVisibleCells);
 
 		if (this->cells[Y][X]->hasMine()) {
 			checkedMine = true;

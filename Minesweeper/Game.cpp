@@ -40,7 +40,7 @@ void Game::run() const {
 			bool wantToMarkInput;
 			int chosenX;
 			int chosenY;
-			int chosenOptionNum = 0;
+			Options chosenOption;
 			for (int gameAutoTimeout = 0; gameAutoTimeout <= gridSize * gridSize + 100; ++gameAutoTimeout) {
 
 				if (wantToSeeGrid) {
@@ -63,24 +63,23 @@ void Game::run() const {
 				getline(std::cin, userInput);
 
 				// to check if we received special instructions
-				// -1: QUIT, 1:SOLUTION, 2:HELP
-				chosenOptionNum = checkForOptions(currentGrid, userInput, gridHasBeenCreated);
-				if (chosenOptionNum == 1) {
+				chosenOption = checkForOptions(currentGrid, userInput, gridHasBeenCreated);
+				if (chosenOption == Options::SOLUTION) {
 					wantToSeeGrid = true;
 					continue;
 				}
-				else if (chosenOptionNum == 2) {
+				else if (chosenOption == Options::HELP) {
 					wantHelp = true;
 					std::cout << std::endl;
 					continue;
 				}
-				else if (chosenOptionNum == -1) {
+				else if (chosenOption == Options::QUIT) {
 					break;
 				}
 
 
 				// Checking which spot user picked and if they want to check or mark it
-				wantToMarkInput = false; // wantToMarkInput will change to true if user wants to mark/unmark some cell
+				wantToMarkInput = false;
 				if (!inputToCoordinates(userInput, chosenX, chosenY, wantToMarkInput)) {
 					std::cout << "Please try to choose a grid spot again to mark or check: "
 									"(Type 'HELP' for instructions.)" << std::endl;
@@ -89,7 +88,7 @@ void Game::run() const {
 				}
 
 
-				// to check that the intepreted gridspot exists (is withing range)
+				// to check that the intepreted gridspot exists (within range)
 				if (chosenX < 0 || chosenX  > gridSize - 1 || chosenY < 0 || chosenY  > gridSize - 1) {
 					std::cout << "Chosen coordinates out of range! Please choose a grid spot again to mark or check: "
 									"(Type 'HELP' for instructions.)" << std::endl;
@@ -103,30 +102,18 @@ void Game::run() const {
 				if (!gridHasBeenCreated) {
 					currentGrid->createMinesAndNums(chosenX, chosenY);
 					gridHasBeenCreated = true;
+
+					if (wantToMarkInput) {
+						std::cout << "\nYou wanted to mark an input on your first turn.\n"
+								  << "Unfortunately I am not going to let you do this. ;)" << std::endl;
+						wantToMarkInput = false;
+					}
 				}
 
 
 
 				// to update visible grid by checking or (un)marking
-				if (!wantToMarkInput) {
-
-					bool checkedMine = currentGrid->checkInputCoordinates(chosenX, chosenY);
-					currentGrid->printGrid();
-
-					std::cout << "You chose to check: "
-							  << xCoordToLetters(chosenX) << ' ' << chosenY + 1 << '\n' << std::endl;
-
-					// lost because of checking a mine
-					if (checkedMine) {
-						std::cout << "\n\n**********You Lost!**********\n\n"
-								  << "\nPress ENTER to see the solution..." << std::flush;
-						std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
-						currentGrid->printSolution();
-						std::cout << "\n\n**********You Lost!**********\n" << std::endl;
-						break;
-					}
-				}
-				else {
+				if (wantToMarkInput) {
 					
 					currentGrid->markInputCoordinates(chosenX, chosenY);
 
@@ -135,13 +122,28 @@ void Game::run() const {
 					std::cout << "You chose to mark: "
 							  << xCoordToLetters(chosenX) << ' ' << chosenY + 1 << '\n' << std::endl;
 
-					// Win condition
 					if (currentGrid->allMinesMarked()) {
-						std::cout << "\n\n**********You Won!**********\n\n"
-								  << "\nPress ENTER to see the solution..." << std::flush;
-						std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
-						currentGrid->printSolution();
-						std::cout << "\n\n**********You Won!**********\n" << std::endl;
+						// Win condition (all mines marked)
+						this->winScreen(currentGrid);
+						break;
+					}
+				}
+				else {
+
+					bool checkedMine = currentGrid->checkInputCoordinates(chosenX, chosenY);
+					currentGrid->printGrid();
+
+					std::cout << "You chose to check: "
+						<< xCoordToLetters(chosenX) << ' ' << chosenY + 1 << '\n' << std::endl;
+
+					if (checkedMine) {
+						// Losing condition (checked a mine)
+						this->gameOverScreen(currentGrid);
+						break;
+					}
+					else if (currentGrid->allNonMinesVisible()) {
+						// Win condition (all non mines visible/checked)
+						this->winScreen(currentGrid);
 						break;
 					}
 				}
@@ -278,10 +280,28 @@ std::string Game::xCoordToLetters(const int chosenX) const {
 	}
 }
 
+void Game::winScreen(std::unique_ptr<Grid> const& currentGrid) const {
+
+	std::cout << "\n\n**********You Won!**********\n\n"
+		<< "\nPress ENTER to see the solution..." << std::flush;
+	std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+	currentGrid->printSolution();
+	std::cout << "\n\n**********You Won!**********\n" << std::endl;
+}
+
+void Game::gameOverScreen(std::unique_ptr<Grid> const& currentGrid) const {
+
+	std::cout << "\n\n**********You Lost!**********\n\n"
+		<< "\nPress ENTER to see the solution..." << std::flush;
+	std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
+	currentGrid->printSolution();
+	std::cout << "\n\n**********You Lost!**********\n" << std::endl;
+}
+
 
 
 // to check for special input options: solution, quit and help
-int Game::checkForOptions(std::unique_ptr<Grid> const& currentGrid, std::string input, const bool gridHasBeenCreated) const {
+Game::Options Game::checkForOptions(std::unique_ptr<Grid> const& currentGrid, std::string input, const bool gridHasBeenCreated) const {
 
 	std::transform(input.begin(), input.end(), input.begin(), [](unsigned char c) { return std::toupper(c); });
 
@@ -292,12 +312,12 @@ int Game::checkForOptions(std::unique_ptr<Grid> const& currentGrid, std::string 
 			currentGrid->printSolution();
 		}
 		std::cout << std::endl;
-		return -1;
+		return Options::QUIT;
 	}
 
 	// user wants to see the help text
 	if (input == "HELP" || input == "H" || input == "INFO" || input == "INSTRUCTIONS" || input == "I") {
-		return 2;
+		return Options::HELP;
 	}
 
 	// solution given, if user asks for it
@@ -311,10 +331,10 @@ int Game::checkForOptions(std::unique_ptr<Grid> const& currentGrid, std::string 
 			std::cin.ignore(std::numeric_limits <std::streamsize> ::max(), '\n');
 		}
 		std::cout << std::endl;
-		return 1;
+		return Options::SOLUTION;
 	}
 
-	return 0;
+	return Options::NOTHING;
 }
 
 
