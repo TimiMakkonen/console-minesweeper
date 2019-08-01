@@ -143,7 +143,6 @@ void Grid::incrNumsAroundMine(const int X, const int Y) {
 
 
 
-// to print the grid
 void Grid::printGrid() const {
 	std::cout << std::endl;
 	this->printCharRow();
@@ -157,7 +156,6 @@ void Grid::printGrid() const {
 
 
 
-// to print row of a grid
 void Grid::printRow(const int rowNumber) const {
 	std::cout << std::setw(3) << rowNumber + 1 << ' ';
 	for (int i = 0; i < this->gridSize; ++i) {
@@ -202,8 +200,7 @@ char Grid::cellPrintSymbol(const int X, const int Y) const {
 }
 
 
-
-// to print line between on a grid
+// to print lines between on a grid
 void Grid::printLineRow() const {
 	std::cout << "    ";
 	for (int i = 0; i < this->gridSize; ++i) {

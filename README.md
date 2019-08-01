@@ -30,6 +30,11 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
+#### Version 5.2:
+
+* Slightly improved readability of the code and fixed minor things.
+* Changed minimum size of grid into 4x4 to stop softlock when choosing number of mines for smaller grids.
+
 #### Version 5.1:
 
 * Added win condition (all non mines visible/checked).

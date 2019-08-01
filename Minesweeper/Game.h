@@ -10,6 +10,7 @@ class Game {
 private:
 
 	int MAXIMUM_GRID_SIZE = 99;
+	int MINIMUM_GRID_SIZE = 4;
 
 	enum class Options {
 		QUIT,

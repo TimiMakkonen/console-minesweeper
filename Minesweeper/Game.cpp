@@ -18,8 +18,10 @@ void Game::run() const {
 
 		this->welcomeText();
 
+		// ask user for gridSize
 		int gridSize = this->chooseGridSize();
 
+		// ask user for numOfMines
 		int numOfMines = this->chooseNumOfMines(gridSize);
 
 
@@ -206,8 +208,9 @@ int Game::chooseGridSize() const {
 		try {
 			getline(std::cin, gridSizeStr);
 			gridSize = stoi(gridSizeStr); // if input (gridSizeStr) is not a number, throws exception
-			if (gridSize > this->MAXIMUM_GRID_SIZE || gridSize <= 0) {
-				std::cout << "Too small or large number! Choose again: (Choose a whole number between 1 and "
+			if (gridSize > this->MAXIMUM_GRID_SIZE || gridSize < MINIMUM_GRID_SIZE) {
+				std::cout << "Too small or large number! Choose again: (Choose a whole number between "
+						  << this->MINIMUM_GRID_SIZE << " and "
 						  << this->MAXIMUM_GRID_SIZE << ". I recommend number to be <50. )" << std::endl;
 			}
 			else {

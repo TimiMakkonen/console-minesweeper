@@ -27,7 +27,6 @@ private:
 	std::vector< std::vector< std::unique_ptr<Cell> > > cells;
 
 
-
 	std::vector< std::vector< std::unique_ptr<Cell> > > initCells(const int gridSize);
 
 	void chooseRandomMineCells(std::vector<int>& mineSpots, const int initChosenX, const int initChosenY) const;
