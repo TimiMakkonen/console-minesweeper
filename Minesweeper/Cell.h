@@ -1,34 +1,38 @@
 #ifndef CELL_H
 #define CELL_H
 
-class Cell {
-private:
+namespace Minesweeper {
 
-	bool _isVisible = false;
-	bool _hasMine = false;
-	bool _isMarked = false;
-	int _numOfMinesAround = 0;
+	class Cell {
+	private:
 
-public:
+		bool _isVisible = false;
+		bool _hasMine = false;
+		bool _isMarked = false;
+		int _numOfMinesAround = 0;
 
-	bool isVisible() const;
-	
-	bool hasMine() const;
+	public:
 
-	bool isMarked() const;
+		bool isVisible() const;
 
-	int numOfMinesAround() const;
+		bool hasMine() const;
 
-	void incrNumOfMinesAround();
+		bool isMarked() const;
 
-	void makeVisible();
+		int numOfMinesAround() const;
 
-	void putMine();
+		void incrNumOfMinesAround();
 
-	void markCell();
-	
-	void unmarkCell();
+		void makeVisible();
 
-};
+		void putMine();
+
+		void markCell();
+
+		void unmarkCell();
+
+	};
+
+}
 
 #endif

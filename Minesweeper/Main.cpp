@@ -13,7 +13,7 @@ int main() {
 	std::random_device rd;
 	myRandomSeed.seed(rd());
 
-	Game game;
+	Minesweeper::Game game;
 	game.run();
 
 	std::cout << "You have exited the game." << std::endl;

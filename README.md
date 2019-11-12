@@ -30,6 +30,12 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
+#### Version 6.0:
+
+* Moved print functionality from 'Grid' to 'Game'.
+* Changed cerr's into asserts and throws.
+* Moved and changed some of the game logic.
+
 #### Version 5.2:
 
 * Slightly improved readability of the code and fixed minor things.
@@ -41,7 +47,7 @@ Throughout making this program, I have only googled some methods, good practices
 * Made impossible to mark a cell on the first turn.
 * Slightly improved readability of the code.
 
-#### Version 5:
+#### Version 5.0:
 
 * Updated program from C-style to OOP.
 	* New 'Game', 'Grid' and 'Cell' classes.
@@ -49,7 +55,7 @@ Throughout making this program, I have only googled some methods, good practices
 	* Changed variable naming convention from pascal to camel and made names easier to understand.
 * Changed pseudo-random number generator from 'rand' to 'std::mt19937' (Mersenne Twister 19937) to improve randomness.
 
-#### Version 4:
+#### Version 4.0:
 
 * Continued with improvements on the input system.
 * Increased maximum size of the grid up to 99x99. (I do not recommend grids larger than 50x50.)
@@ -64,7 +70,7 @@ Throughout making this program, I have only googled some methods, good practices
 * Made sure that you cannot lose on the first turn.
 	* Creation of the grid has been moved to take into account players first choice, making sure player will make some progress.
 
-#### Version 3:
+#### Version 3.0:
 
 * Slightly improved readability of the code.
 * Started to deal with proper handling of wrong inputs.
@@ -73,7 +79,7 @@ Throughout making this program, I have only googled some methods, good practices
 * Initial options/special input menu implemented.
 
 
-#### Version 2:
+#### Version 2.0:
 
 * Fixed some visual mistakes and made the game look prettier 
 * Added automatic mine check for squares around, when choosing a grid location with no surrounding mines.
@@ -82,7 +88,7 @@ Throughout making this program, I have only googled some methods, good practices
 * More convenient input system.
 * \+ Background work to make next additions/fixes easier to implement.
 
-#### Version 1:
+#### Version 1.0:
 
 
 Initial version of the game. Mostly in working condition.

@@ -9,62 +9,63 @@
 
 extern std::mt19937 myRandomSeed;
 
-class Grid {
-private:
+namespace Minesweeper {
 
-	// symbols for visuals
-	const char MINESYMBOL = '*';
-	const char MARKED_SYMBOL = '#'; // 'M' could also work
-	const char NO_MINES_AROUND_SYMBOL = char(254);
-	const char NOT_VISIBLE_SYMBOL = ' ';
-	const char ERROR_SYMBOL = 'E';
+	class Grid {
+	private:
 
-	int gridSize;
-	int numOfMines;
-	int numOfMarkedMines = 0;
-	int numOfWronglyMarkedMines = 0;
-	int numOfVisibleCells = 0;
-	std::vector< std::vector< std::unique_ptr<Cell> > > cells;
+		int gridSize;
+		int numOfMines;
+		int numOfMarkedMines = 0;
+		int numOfWronglyMarkedMines = 0;
+		int numOfVisibleCells = 0;
+		bool _checkedMine = false;
+
+		std::vector< std::vector< std::unique_ptr<Cell> > > cells;
 
 
-	std::vector< std::vector< std::unique_ptr<Cell> > > initCells(const int gridSize);
+		std::vector< std::vector< std::unique_ptr<Cell> > > initCells(const int gridSize);
 
-	void chooseRandomMineCells(std::vector<int>& mineSpots, const int initChosenX, const int initChosenY) const;
+		void chooseRandomMineCells(std::vector<int>& mineSpots, const int initChosenX, const int initChosenY) const;
 
-	void createMine(const int X, const int Y);
+		void createMine(const int X, const int Y);
 
-	void incrNumsAroundMine(const int X, const int Y);
+		void incrNumsAroundMine(const int X, const int Y);
 
-	void printCharRow() const;
+		void checkAroundCoordinate(const int X, const int Y);
 
-	void printLineRow() const;
+		bool allMinesMarked() const;
 
-	void printRow(const int RowNumber) const;
+		bool allNonMinesVisible() const;
 
-	char cellPrintSymbol(const int X, const int Y) const;
+		bool checkedMine() const;
 
-	bool checkAroundCoordinate(const int X, const int Y);
+	public:
 
-public:
+		Grid(int gridSize, int numOfMines);
 
-	Grid(int gridSize, int numOfMines);
+		void createMinesAndNums(const int initChosenX, const int initChosenY);
 
-	void createMinesAndNums(const int initChosenX, const int initChosenY);
+		// to check user given coordinates, and make it visible
+		void checkInputCoordinates(const int X, const int Y);
 
-	void printGrid() const;
-	
-	void printSolution() const;
+		// to mark (or unmark) given coordinates, and keeping track of marked and wrongly marked mines
+		void markInputCoordinates(const int X, const int Y);
 
-	// to check user given coordinates, and make it visible
-	bool checkInputCoordinates(const int X, const int Y);
+		bool playerHasWon() const;
 
-	// to mark (or unmark) given coordinates, and keeping track of marked and wrongly marked mines
-	void markInputCoordinates(const int X, const int Y);
+		bool playerHasLost() const;
 
-	bool allMinesMarked() const;
+		bool isCellVisible(const int X, const int Y) const;
 
-	bool allNonMinesVisible() const;
+		bool doesCellHaveMine(const int X, const int Y) const;
 
-};
+		bool isCellMarked(const int X, const int Y) const;
+
+		int numOfMinesAroundCell(const int X, const int Y) const;
+
+	};
+
+}
 
 #endif
