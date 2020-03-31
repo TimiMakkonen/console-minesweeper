@@ -17,6 +17,6 @@ int main() {
 	game.run();
 
 	std::cout << "You have exited the game." << std::endl;
-
+	
 	return 0;
 }

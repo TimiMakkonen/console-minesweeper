@@ -14,7 +14,8 @@ namespace Minesweeper {
 	class Grid {
 	private:
 
-		int gridSize;
+		int gridHeight;
+		int gridWidth;
 		int numOfMines;
 		int numOfMarkedMines = 0;
 		int numOfWronglyMarkedMines = 0;
@@ -24,7 +25,7 @@ namespace Minesweeper {
 		std::vector< std::vector< std::unique_ptr<Cell> > > cells;
 
 
-		std::vector< std::vector< std::unique_ptr<Cell> > > initCells(const int gridSize);
+		std::vector< std::vector< std::unique_ptr<Cell> > > initCells();
 
 		void chooseRandomMineCells(std::vector<int>& mineSpots, const int initChosenX, const int initChosenY) const;
 
@@ -43,6 +44,8 @@ namespace Minesweeper {
 	public:
 
 		Grid(int gridSize, int numOfMines);
+
+		Grid(int gridHeight, int gridWidth, int numOfMines);
 
 		void createMinesAndNums(const int initChosenX, const int initChosenY);
 

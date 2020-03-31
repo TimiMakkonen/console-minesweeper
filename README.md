@@ -30,6 +30,10 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
+#### Version 6.1.0: 
+
+* Separated 'gridSize' into 'gridHeight' and 'gridWidth' to allow 'non-square' grids both in 'Grid' and 'Game'.
+
 #### Version 6.0:
 
 * Moved print functionality from 'Grid' to 'Game'.
@@ -108,4 +112,5 @@ Initial version of the game. Mostly in working condition.
 * Add an option to add mines by percentage, not by quantity.
 * Add an option to choose between 'normal' and 'condensed' grid.
 * Change solution screen. (Does not properly work with large grids atm.)
+* Move 'numOfMines' check to grid.
 

@@ -19,7 +19,7 @@ namespace Minesweeper {
 
 			this->welcomeText();
 
-			// ask user for gridSize
+			// ask user for gridSize (gridHeight & gridWidth)
 			this->chooseGridSize();
 
 			// ask user for numOfMines
@@ -44,7 +44,7 @@ namespace Minesweeper {
 				int chosenX;
 				int chosenY;
 				Options chosenOption;
-				for (int gameAutoTimeout = 0; gameAutoTimeout <= this->gridSize * this->gridSize + 100; ++gameAutoTimeout) {
+				for (int gameAutoTimeout = 0; gameAutoTimeout <= this->gridHeight * this->gridWidth + 100; ++gameAutoTimeout) {
 
 					if (wantToSeeGrid) {
 						this->printGrid();
@@ -92,7 +92,7 @@ namespace Minesweeper {
 
 
 					// to check that the intepreted gridspot exists (within range)
-					if (chosenX < 0 || chosenX  > this->gridSize - 1 || chosenY < 0 || chosenY  > this->gridSize - 1) {
+					if (chosenX < 0 || chosenX  > this->gridWidth - 1 || chosenY < 0 || chosenY  > this->gridHeight - 1) {
 						std::cout << "Chosen coordinates out of range! Please choose a grid spot again to mark or check: "
 							"(Type 'HELP' for instructions.)" << std::endl;
 						wantToSeeDefaultInputQ = false;
@@ -171,35 +171,88 @@ namespace Minesweeper {
 	}
 
 
-
+	
 	void Game::chooseGridSize() {
 
-		std::cout << "First of all, choose desired grid size: (I recommend '10' => 10x10 grid)" << std::endl;
+		std::cout << "First of all, choose desired grid size.\n"
+			<< "Either type a single integer 'Z' for a 'ZxZ' square shaped grid or "
+			<< "type two integers 'Y' (height) & 'Z' (width) in form 'YxZ' for a 'YxZ' rectangular shaped grid.\n"
+			<< "('10' => '10x10' grid is the recommended size)\n"
+			<< "Grid size:" << std::endl;
 
 		// input grid size
+		// TODO: trim whitespace to accept different inputs
 		std::string gridSizeStr;
 		bool validSizeInput = false;
 		while (!validSizeInput) {
+
+			getline(std::cin, gridSizeStr);
+
+			int inputGridHeight;
+			int inputGridWidth;
+
 			try {
-				getline(std::cin, gridSizeStr);
-				this->gridSize = stoi(gridSizeStr); // if input (gridSizeStr) is not a number, throws exception
-				if (this->gridSize > this->MAXIMUM_GRID_SIZE || this->gridSize < MINIMUM_GRID_SIZE) {
-					std::cout << "Too small or large number! Choose again: (Choose a whole number between "
-						<< this->MINIMUM_GRID_SIZE << " and "
-						<< this->MAXIMUM_GRID_SIZE << ". I recommend number to be <50. )" << std::endl;
+				// If input string contains character 'x', take input in form 'YxZ', where Y = height and Z = width,
+				// else take only only one integer 'Z' to make grid of size 'ZxZ'.
+				if (auto strDivisorCharPos = gridSizeStr.find('x'); strDivisorCharPos != std::string::npos) {
+
+					std::string inputGridHeightStr = gridSizeStr.substr(0, strDivisorCharPos);
+					// if inputGridHeightStr is not a number, throws exception and cout's it
+					inputGridHeight = inputStringToInt(inputGridHeightStr); 
+
+					std::string inputGridWidthStr = gridSizeStr.substr(strDivisorCharPos + 1);
+					// if inputGridWidthStr is not a number, throws exception and cout's it
+					inputGridWidth = inputStringToInt(inputGridWidthStr);
 				}
 				else {
+					
+					// if gridSizeStr is not a number, throws exception and cout's it
+					int inputGridSize = inputStringToInt(gridSizeStr);
+					inputGridHeight = inputGridSize;
+					inputGridWidth = inputGridSize;
+				}
+
+				// check gridWidth and gridHeight are within limits
+				if (inputGridWidth > this->MAXIMUM_GRID_WIDTH || inputGridHeight > this->MAXIMUM_GRID_HEIGHT
+					|| inputGridWidth < MINIMUM_GRID_WIDTH || inputGridHeight < MINIMUM_GRID_HEIGHT) {
+					std::cout << "Too small or large number! Choose again: (Choose height between "
+						<< this->MINIMUM_GRID_HEIGHT << " and "
+						<< this->MAXIMUM_GRID_HEIGHT << " AND width between "
+						<< this->MINIMUM_GRID_WIDTH << " and "
+						<< this->MAXIMUM_GRID_WIDTH << ". Recommended number: 5 < Z < 50. )" << std::endl;
+				}
+				else {
+					this->gridHeight = inputGridHeight;
+					this->gridWidth = inputGridWidth;
 					validSizeInput = true;
 				}
 			}
 			catch (const std::invalid_argument&) {
-				std::cout << "Not a number! Please try to enter the grid size again:" << std::endl;
+				std::cout << "Please try to enter the grid size again:" << std::endl;
 			}
 			catch (const std::out_of_range&) {
-				std::cout << "Too large number! Please try to enter the grid size again: (Choose a whole number between 1 and "
-					<< this->gridSize * this->gridSize - 9 << " )" << std::endl;
+				std::cout << "Please try to enter the grid size again:" << std::endl;
 			}
 		}
+
+		std::cout << "You chose grid size: " << this->gridHeight << "x" << this->gridWidth << "." << std::endl;
+	}
+
+	int Game::inputStringToInt(std::string input) {
+
+		int output;
+		try {
+			output = stoi(input); // if input is not a number, throws exception
+		}
+		catch (const std::invalid_argument&) {
+			std::cout << input << " is not a number!" << std::endl;
+			throw;
+		}
+		catch (const std::out_of_range&) {
+			std::cout << input << " is too small or large number!" << std::endl;
+			throw;
+		}
+		return output;
 	}
 
 
@@ -212,30 +265,40 @@ namespace Minesweeper {
 		std::string numOfMinesStr;
 		bool validNumOfMinesInput = false;
 		while (!validNumOfMinesInput) {
+
+			getline(std::cin, numOfMinesStr);
+
+			int inputNumOfMines;
+
 			try {
-				getline(std::cin, numOfMinesStr);
-				this->numOfMines = stoi(numOfMinesStr); // if input (numOfMinesStr) is not a number, throws exception
-				if (this->numOfMines > this->gridSize * this->gridSize - 9 || this->numOfMines <= 0) {
+				// if numOfMinesStr is not a number, throws exception and cout's it
+				inputNumOfMines = inputStringToInt(numOfMinesStr);
+
+				// check numOfMines is within limits
+				if (inputNumOfMines > this->gridHeight * this->gridWidth - 9 || inputNumOfMines <= 0) {
 					std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between 1 and "
-						<< this->gridSize * this->gridSize - 9 << " )" << std::endl;
+						<< this->gridHeight * this->gridWidth - 9 << " )" << std::endl;
 				}
 				else {
+					this->numOfMines = inputNumOfMines;
 					validNumOfMinesInput = true;
 				}
 			}
 			catch (const std::invalid_argument&) {
-				std::cout << "Not a number! Please try enter the number of mines again:" << std::endl;
+				std::cout << "Please try enter the number of mines again:" << std::endl;
 			}
 			catch (const std::out_of_range&) {
-				std::cout << "Too large number! Please try enter the number of mines again: (Choose a whole number between 1 and "
-					<< this->gridSize * this->gridSize - 9 << " )" << std::endl;
+				std::cout << "Please try enter the number of mines again: (Choose a whole number between 1 and "
+					<< this->gridHeight * this->gridWidth - 9 << " )" << std::endl;
 			}
 		}
+
+		std::cout << "You chose to hide " << this->numOfMines << " mines." << std::endl;
 	}
 
 	void Game::initEmptyGrid() {
 
-		currentGrid = std::make_unique<Grid>(this->gridSize, this->numOfMines);
+		currentGrid = std::make_unique<Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
 	}
 
 	void Game::helpText() const {
@@ -299,7 +362,7 @@ namespace Minesweeper {
 		if (playerWantsToPlayAgain) {
 
 			std::cout << "Would you like to use the same rule set? (Size of the grid: "
-				<< this->gridSize << 'x' << this->gridSize << " and the number of mines: "
+				<< this->gridHeight << 'x' << this->gridWidth << " and the number of mines: "
 				<< this->numOfMines << ") (Y/N)" << std::endl;
 			std::string wantToUseSameRules;
 			getline(std::cin, wantToUseSameRules);
@@ -452,11 +515,11 @@ namespace Minesweeper {
 
 
 
-	// TODO CHECKED
+	
 	char Game::cellPrintSymbol(const int X, const int Y) const {
 
 		char symbol;
-		if (X < 0 || Y < 0 || X >= this->gridSize || Y >= this->gridSize) {
+		if (X < 0 || Y < 0 || X >= this->gridWidth || Y >= this->gridHeight) {
 			throw std::out_of_range("Game::cellPrintSymbol(const int X, const int Y): Trying to print cell outside grid.");
 		}
 		else {
@@ -485,29 +548,29 @@ namespace Minesweeper {
 		return symbol;
 	}
 
-	// TODO CHECKED
-	// to print letters above a grid
+	
+	// to print letters above a grid (aka symbols of grid columns)
 	void Game::printCharRow() const {
 
 		// standard print for grids with size<27
 		std::cout << "    ";
-		if (this->gridSize <= 26) {
-			for (int i = 0; i < this->gridSize; ++i) {
+		if (this->gridWidth <= 26) {
+			for (int i = 0; i < this->gridWidth; ++i) {
 				std::cout << "  " << char(65 + i) << ' ';
 			}
 		}
 
 		// additional print for grids size >=27 (works, but could possibly be prettier)
-		if (this->gridSize > 26 && this->gridSize <= 675) {
+		if (this->gridWidth > 26 && this->gridWidth <= 675) {
 			for (int i = 0; i < 26; ++i) {
 				std::cout << "  " << char(65 + i) << ' ';
 			}
-			int charNumbOfLastEntry = this->gridSize / 26 - 1;
+			int charNumbOfLastEntry = this->gridWidth / 26 - 1;
 			for (int i = 0; i < charNumbOfLastEntry; ++i) {
 				for (int j = 0; j < 26; ++j)
 					std::cout << "  " << char(65 + i) << char(65 + j);
 			}
-			for (int i = 0; i < this->gridSize % 26; ++i) {
+			for (int i = 0; i < this->gridWidth % 26; ++i) {
 				std::cout << "  " << char(65 + charNumbOfLastEntry) << char(65 + i);
 			}
 		}
@@ -515,30 +578,30 @@ namespace Minesweeper {
 		std::cout << ' ' << std::endl;
 	}
 
-	// TODO CHECKED
+	
 	// to print lines between on a grid
 	void Game::printLineRow() const {
 		std::cout << "    ";
-		for (int i = 0; i < this->gridSize; ++i) {
+		for (int i = 0; i < this->gridWidth; ++i) {
 			std::cout << "+ - ";
 		}
 		std::cout << '+' << std::endl;
 	}
 
-	// TODO CHECKED
+	
 	void Game::printRow(const int rowNumber) const {
 		std::cout << std::setw(3) << rowNumber + 1 << ' ';
-		for (int i = 0; i < this->gridSize; ++i) {
+		for (int i = 0; i < this->gridWidth; ++i) {
 			std::cout << "| " << this->cellPrintSymbol(i, rowNumber) << ' ';
 		}
 		std::cout << '|' << std::endl;
 	}
 
-	// TODO CHECKED
+
 	void Game::printGrid() const {
 		std::cout << std::endl;
 		this->printCharRow();
-		for (int rowNum = 0; rowNum < this->gridSize; ++rowNum) {
+		for (int rowNum = 0; rowNum < this->gridHeight; ++rowNum) {
 			this->printLineRow();
 			this->printRow(rowNum);
 		}
@@ -546,7 +609,7 @@ namespace Minesweeper {
 		std::cout << std::endl;
 	}
 
-	// TODO CHECKED
+
 	// to print out the solution 
 	//	* condensed layout
 	//	* should probably be redone
@@ -557,18 +620,18 @@ namespace Minesweeper {
 
 		// to print letters above solution grid
 		std::cout << std::setw(5);
-		for (int i = 0; i < this->gridSize; ++i) {
+		for (int i = 0; i < this->gridWidth; ++i) {
 			std::cout << ' ' << char(65 + i);
 		}
 		std::cout << std::setw(10);
-		for (int i = 0; i < this->gridSize; ++i) {
+		for (int i = 0; i < this->gridWidth; ++i) {
 			std::cout << ' ' << char(65 + i);
 		}
 		std::cout << std::endl;
 
-		for (int i = 0; i < this->gridSize; ++i) {
+		for (int i = 0; i < this->gridHeight; ++i) {
 			std::cout << std::setw(3) << i + 1 << '|';
-			for (int j = 0; j < this->gridSize; ++j) {
+			for (int j = 0; j < this->gridWidth; ++j) {
 				if (currentGrid->doesCellHaveMine(j, i)) {
 					std::cout << ' ' << this->MINESYMBOL;
 				}
@@ -582,7 +645,7 @@ namespace Minesweeper {
 
 			// simplified solution grid (shows only mines)
 			std::cout << std::setw(8) << i + 1 << '|';
-			for (int j = 0; j < this->gridSize; ++j) {
+			for (int j = 0; j < this->gridWidth; ++j) {
 				if (currentGrid->doesCellHaveMine(j, i)) {
 					std::cout << ' ' << this->MINESYMBOL;
 				}

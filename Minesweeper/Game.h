@@ -11,8 +11,10 @@ namespace Minesweeper {
 	class Game {
 	private:
 
-		const int MAXIMUM_GRID_SIZE = 99;
-		const int MINIMUM_GRID_SIZE = 4;
+		const int MAXIMUM_GRID_HEIGHT = 99; // DO NOT CHANGE!
+		const int MINIMUM_GRID_HEIGHT = 4; // DO NOT CHANGE!
+		const int MAXIMUM_GRID_WIDTH = MAXIMUM_GRID_HEIGHT; // DO NOT CHANGE!
+		const int MINIMUM_GRID_WIDTH = MINIMUM_GRID_HEIGHT; // DO NOT CHANGE!
 
 		// symbols for visuals
 		const char MINESYMBOL = '*';
@@ -21,7 +23,8 @@ namespace Minesweeper {
 		const char NOT_VISIBLE_SYMBOL = ' ';
 		const char ERROR_SYMBOL = 'E';
 
-		int gridSize;
+		int gridWidth;
+		int gridHeight;
 		int numOfMines;
 		std::unique_ptr<Grid> currentGrid = nullptr;
 
@@ -35,6 +38,8 @@ namespace Minesweeper {
 		void welcomeText() const;
 
 		void chooseGridSize();
+
+		int inputStringToInt(std::string input);
 
 		void chooseNumOfMines();
 
