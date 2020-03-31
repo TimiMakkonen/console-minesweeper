@@ -23,12 +23,15 @@ namespace Minesweeper {
 			this->chooseGridSize();
 
 			// ask user for numOfMines
-			this->chooseNumOfMines();
+			this->chooseNumOfMines(true);
+
+			
 
 
 			// variable to determine if you want to play again with the same rules
-			bool playerWantsToPlayAgainSame = false;
+			bool playerWantsToPlayAgainSameRules = false;
 
+			
 			do {
 
 				initEmptyGrid();
@@ -149,10 +152,10 @@ namespace Minesweeper {
 				}//endfor
 				
 
-				std::tie(playerWantsToPlayAgain, playerWantsToPlayAgainSame) = this->wantToPlayAgain();
+				std::tie(playerWantsToPlayAgain, playerWantsToPlayAgainSameRules) = this->wantToPlayAgain();
 
 
-			} while (playerWantsToPlayAgainSame);
+			} while (playerWantsToPlayAgainSameRules);
 
 		} while (playerWantsToPlayAgain);
 
@@ -257,9 +260,14 @@ namespace Minesweeper {
 
 
 
-	void Game::chooseNumOfMines() {
+	void Game::chooseNumOfMines(bool firstTry) {
 
-		std::cout << "Perfect! Now choose the number of mines:" << std::endl;
+		if (firstTry) {
+			std::cout << "Perfect! Now choose the number of mines:" << std::endl;
+		}
+		else {
+			std::cout << "Try choosing the number of mines again:" << std::endl;
+		}
 
 		// input to number of mines
 		std::string numOfMinesStr;
@@ -273,11 +281,14 @@ namespace Minesweeper {
 			try {
 				// if numOfMinesStr is not a number, throws exception and cout's it
 				inputNumOfMines = inputStringToInt(numOfMinesStr);
+				
+				// check number of mines is within grid limits
+				if (inputNumOfMines > Grid::maxNumOfMines(this->gridHeight, this->gridWidth) 
+							|| inputNumOfMines < Grid::minNumOfMines(this->gridHeight, this->gridWidth)) {
 
-				// check numOfMines is within limits
-				if (inputNumOfMines > this->gridHeight * this->gridWidth - 9 || inputNumOfMines <= 0) {
-					std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between 1 and "
-						<< this->gridHeight * this->gridWidth - 9 << " )" << std::endl;
+					std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
+						<< Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+						<< Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
 				}
 				else {
 					this->numOfMines = inputNumOfMines;
@@ -288,18 +299,36 @@ namespace Minesweeper {
 				std::cout << "Please try enter the number of mines again:" << std::endl;
 			}
 			catch (const std::out_of_range&) {
-				std::cout << "Please try enter the number of mines again: (Choose a whole number between 1 and "
-					<< this->gridHeight * this->gridWidth - 9 << " )" << std::endl;
+				std::cout << "Please try enter the number of mines again:" << std::endl;
 			}
 		}
 
 		std::cout << "You chose to hide " << this->numOfMines << " mines." << std::endl;
 	}
 
+
+
+	// initializes empty Minesweeper grid and makes sure the number of mines is valid,
+	// if not, makes player to choose the number of mines again
 	void Game::initEmptyGrid() {
 
-		currentGrid = std::make_unique<Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
+		bool validNumOfMinesChosen = false;
+		while (!validNumOfMinesChosen) {
+			try {
+				currentGrid = std::make_unique<Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
+
+				validNumOfMinesChosen = true;
+			}
+			catch (const std::out_of_range&) {
+				std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
+					<< Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+					<< Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
+				this->chooseNumOfMines(false);
+			}
+		}
 	}
+
+
 
 	void Game::helpText() const {
 

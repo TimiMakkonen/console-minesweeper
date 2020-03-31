@@ -10,9 +10,21 @@
 
 namespace Minesweeper {
 
-	Grid::Grid(int gridSize, int numOfMines) : gridHeight(gridSize), gridWidth(gridSize), numOfMines(numOfMines), cells(this->initCells()) {}
+	Grid::Grid(int gridSize, int numOfMines) : gridHeight(gridSize), gridWidth(gridSize), numOfMines(this->verifyNumOfMines(numOfMines)), cells(this->initCells()) {}
 
-	Grid::Grid(int gridHeight, int gridWidth, int numOfMines) : gridHeight(gridHeight), gridWidth(gridWidth), numOfMines(numOfMines), cells(this->initCells()) {}
+	Grid::Grid(int gridHeight, int gridWidth, int numOfMines) : gridHeight(gridHeight), gridWidth(gridWidth), numOfMines(this->verifyNumOfMines(numOfMines)), cells(this->initCells()) {}
+
+
+
+	int Grid::verifyNumOfMines(int numOfMines) {
+
+		if (numOfMines > maxNumOfMines(this->gridHeight, this->gridWidth) || numOfMines < minNumOfMines()) {
+			throw std::out_of_range("Grid::verifyNumOfMines(int numOfMines): Trying to create a grid with too few or many mines.");
+		}
+		return numOfMines;
+	}
+
+
 
 	std::vector< std::vector< std::unique_ptr<typename Cell> > > Grid::initCells() {
 
@@ -226,6 +238,8 @@ namespace Minesweeper {
 		return this->cells[Y][X]->numOfMinesAround();
 	}
 
+	
+
 	bool Grid::checkedMine() const {
 		return this->_checkedMine;
 	}
@@ -282,4 +296,24 @@ namespace Minesweeper {
 		}
 	}
 
+
+	// static method
+	int Grid::maxNumOfMines(int gridH, int gridW) {
+
+		return gridH * gridW - 9;
+	}
+
+
+	// static method
+	int Grid::minNumOfMines() {
+
+		return 1;
+	}
+
+
+	// static method
+	int Grid::minNumOfMines(int gridH, int gridW) {
+
+		return minNumOfMines();
+	}
 }

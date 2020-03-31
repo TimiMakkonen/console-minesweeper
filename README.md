@@ -30,7 +30,12 @@ Throughout making this program, I have only googled some methods, good practices
 
 ### Version History:
 
-#### Version 6.1.0: 
+#### Version 6.1.1:
+
+* Added validity check for the number of mines in the constructor of 'Grid'.
+* Created static methods in 'Grid' class to tell the maximum and minimum number of mines allowed in a grid of given size.
+
+#### Version 6.1.0:
 
 * Separated 'gridSize' into 'gridHeight' and 'gridWidth' to allow 'non-square' grids both in 'Grid' and 'Game'.
 
@@ -102,7 +107,6 @@ Initial version of the game. Mostly in working condition.
 ### Fixes and features left to consider/implement:
 
 * Increasing current maximum gridsize from 99x99? Madness?
-* Separating column and row size to allow 'non-square' grids.
 * Making sure incorrect inputs are less likely to cause bugs.
 * Making the game look prettier.
 * Better losing screen.
@@ -112,5 +116,4 @@ Initial version of the game. Mostly in working condition.
 * Add an option to add mines by percentage, not by quantity.
 * Add an option to choose between 'normal' and 'condensed' grid.
 * Change solution screen. (Does not properly work with large grids atm.)
-* Move 'numOfMines' check to grid.
 

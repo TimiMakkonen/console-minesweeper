@@ -25,6 +25,8 @@ namespace Minesweeper {
 		std::vector< std::vector< std::unique_ptr<Cell> > > cells;
 
 
+		int verifyNumOfMines(int numOfMines);
+
 		std::vector< std::vector< std::unique_ptr<Cell> > > initCells();
 
 		void chooseRandomMineCells(std::vector<int>& mineSpots, const int initChosenX, const int initChosenY) const;
@@ -66,6 +68,16 @@ namespace Minesweeper {
 		bool isCellMarked(const int X, const int Y) const;
 
 		int numOfMinesAroundCell(const int X, const int Y) const;
+
+		// ---------------
+		// static methods:
+		// ---------------
+
+		static int maxNumOfMines(int gridHeight, int gridWidth);
+
+		static int minNumOfMines();
+
+		static int minNumOfMines(int gridHeight, int gridWidth);
 
 	};
 

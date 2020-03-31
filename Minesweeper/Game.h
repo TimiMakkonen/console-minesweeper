@@ -41,7 +41,7 @@ namespace Minesweeper {
 
 		int inputStringToInt(std::string input);
 
-		void chooseNumOfMines();
+		void chooseNumOfMines(bool firstTry);
 
 		void initEmptyGrid();
 
