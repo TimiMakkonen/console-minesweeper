@@ -1,6 +1,6 @@
 # Basic Minesweeper game on console
 
-Console version of Minesweeper game written in C++ utilising [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 7.0.0.
+Console version of Minesweeper game written in C++ utilising [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 8.0.0.
 
 ---
 
@@ -28,6 +28,10 @@ Install on your machine using CMake in your preferred way.
 ---
 
 ### Version History:
+
+#### Version 7.1.0:
+
+* Updated application to use [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 8.0.0 by changing appropriate header, variable and class names.
 
 #### Version 7.0.0:
 

@@ -6,14 +6,14 @@
 #include <stdexcept>
 
 #include <console-minesweeper/game.h>
-#include <minesweeper/Grid.h>
+#include <minesweeper/game.h>
 
 namespace console_minesweeper {
 
-	Game::Game(Minesweeper::IRandom* random) : random(random) {
+	Game::Game(minesweeper::IRandom* random) : random(random) {
 
-		// setting static IRandom class to the Grid
-		Minesweeper::Grid::setDefaultRandom(this->random); // remember to add nullptr check after initialising grid!
+		// setting static IRandom class to the minesweeper Game
+		minesweeper::Game::setDefaultRandom(this->random); // remember to add nullptr check after initialising grid!
 	}
 
 	void Game::run() {
@@ -112,7 +112,7 @@ namespace console_minesweeper {
 
 					// create the grid after user has chosen the first coordinates to guarantee a good start
 					if (!gridHasBeenCreated) {
-						this->currentGrid->createMinesAndNums(chosenX, chosenY);
+						this->currentGame->createMinesAndNums(chosenX, chosenY);
 						gridHasBeenCreated = true;
 
 						if (wantToMarkInput) {
@@ -127,7 +127,7 @@ namespace console_minesweeper {
 					// to update visible grid by checking or (un)marking
 					if (wantToMarkInput) {
 
-						this->currentGrid->markInputCoordinates(chosenX, chosenY);
+						this->currentGame->markInputCoordinates(chosenX, chosenY);
 
 						this->printGrid();
 
@@ -136,21 +136,21 @@ namespace console_minesweeper {
 					}
 					else {
 
-						this->currentGrid->checkInputCoordinates(chosenX, chosenY);
+						this->currentGame->checkInputCoordinates(chosenX, chosenY);
 
 						this->printGrid();
 
 						std::cout << "You chose to check: "
 							<< xCoordToLetters(chosenX) << ' ' << chosenY + 1 << '\n' << std::endl;
 
-						if (this->currentGrid->playerHasLost()) {
+						if (this->currentGame->playerHasLost()) {
 							// Losing condition: checked a mine
 							this->gameOverScreen();
 							break;
 						}
 					}
 
-					if (this->currentGrid->playerHasWon()) {
+					if (this->currentGame->playerHasWon()) {
 						// Win condition: all non mines visible/checked or all mines marked
 						this->winScreen();
 						break;
@@ -289,12 +289,12 @@ namespace console_minesweeper {
 				inputNumOfMines = inputStringToInt(numOfMinesStr);
 				
 				// check number of mines is within grid limits
-				if (inputNumOfMines > Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) 
-							|| inputNumOfMines < Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth)) {
+				if (inputNumOfMines > minesweeper::Game::maxNumOfMines(this->gridHeight, this->gridWidth) 
+							|| inputNumOfMines < minesweeper::Game::minNumOfMines(this->gridHeight, this->gridWidth)) {
 
 					std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
-						<< Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
-						<< Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
+						<< minesweeper::Game::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+						<< minesweeper::Game::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
 				}
 				else {
 					this->numOfMines = inputNumOfMines;
@@ -321,14 +321,14 @@ namespace console_minesweeper {
 		bool validNumOfMinesChosen = false;
 		while (!validNumOfMinesChosen) {
 			try {
-				currentGrid = std::make_unique<Minesweeper::Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
+				currentGame = std::make_unique<minesweeper::Game>(this->gridHeight, this->gridWidth, this->numOfMines);
 
 				validNumOfMinesChosen = true;
 			}
 			catch (const std::out_of_range&) {
 				std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
-					<< Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
-					<< Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
+					<< minesweeper::Game::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+					<< minesweeper::Game::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
 				this->chooseNumOfMines(false);
 			}
 		}
@@ -558,20 +558,20 @@ namespace console_minesweeper {
 			throw std::out_of_range("Game::cellPrintSymbol(const int X, const int Y): Trying to print cell outside grid.");
 		}
 		else {
-			if (currentGrid->isCellMarked(X, Y)) {
+			if (currentGame->isCellMarked(X, Y)) {
 				symbol = this->MARKED_SYMBOL;
 			}
 			else {
-				if (currentGrid->isCellVisible(X, Y)) {
-					if (currentGrid->doesCellHaveMine(X, Y)) {
+				if (currentGame->isCellVisible(X, Y)) {
+					if (currentGame->doesCellHaveMine(X, Y)) {
 						symbol = MINESYMBOL;
 					}
 					else {
-						if (currentGrid->numOfMinesAroundCell(X, Y) == 0) {
+						if (currentGame->numOfMinesAroundCell(X, Y) == 0) {
 							symbol = this->NO_MINES_AROUND_SYMBOL;
 						}
 						else {
-							symbol = static_cast<char>(currentGrid->numOfMinesAroundCell(X, Y) + 48);
+							symbol = static_cast<char>(currentGame->numOfMinesAroundCell(X, Y) + 48);
 						}
 					}
 				}
@@ -667,21 +667,21 @@ namespace console_minesweeper {
 		for (int i = 0; i < this->gridHeight; ++i) {
 			std::cout << std::setw(3) << i + 1 << '|';
 			for (int j = 0; j < this->gridWidth; ++j) {
-				if (currentGrid->doesCellHaveMine(j, i)) {
+				if (currentGame->doesCellHaveMine(j, i)) {
 					std::cout << ' ' << this->MINESYMBOL;
 				}
-				else if (currentGrid->numOfMinesAroundCell(j, i) == 0) {
+				else if (currentGame->numOfMinesAroundCell(j, i) == 0) {
 					std::cout << ' ' << this->NO_MINES_AROUND_SYMBOL;
 				}
 				else {
-					std::cout << ' ' << currentGrid->numOfMinesAroundCell(j, i);
+					std::cout << ' ' << currentGame->numOfMinesAroundCell(j, i);
 				}
 			}
 
 			// simplified solution grid (shows only mines)
 			std::cout << std::setw(8) << i + 1 << '|';
 			for (int j = 0; j < this->gridWidth; ++j) {
-				if (currentGrid->doesCellHaveMine(j, i)) {
+				if (currentGame->doesCellHaveMine(j, i)) {
 					std::cout << ' ' << this->MINESYMBOL;
 				}
 				else {

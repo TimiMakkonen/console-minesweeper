@@ -3,10 +3,9 @@
 
 #include <string>
 #include <memory>
-#include <vector> //delete after library fix TODO
 
-#include <minesweeper/IRandom.h>
-#include <minesweeper/Grid.h>
+#include <minesweeper/i_random.h>
+#include <minesweeper/game.h>
 
 namespace console_minesweeper {
 
@@ -25,11 +24,11 @@ namespace console_minesweeper {
 		const char NOT_VISIBLE_SYMBOL = ' ';
 		const char ERROR_SYMBOL = 'E';
 
-		Minesweeper::IRandom* random;
+		minesweeper::IRandom* random;
 		int gridWidth;
 		int gridHeight;
 		int numOfMines;
-		std::unique_ptr<Minesweeper::Grid> currentGrid = nullptr;
+		std::unique_ptr<minesweeper::Game> currentGame = nullptr;
 
 		enum class Options {
 			QUIT,
@@ -81,7 +80,7 @@ namespace console_minesweeper {
 
 	public:
 
-		Game(Minesweeper::IRandom* random);
+		Game(minesweeper::IRandom* random);
 
 		void run();
 

@@ -2,7 +2,7 @@
 cmake_minimum_required (VERSION 3.8)
 
 project(ConsoleMinesweeper 
-        VERSION 7.0.0
+        VERSION 7.1.0
         DESCRIPTION "Console Minesweeper Game"
         LANGUAGES CXX)
 
