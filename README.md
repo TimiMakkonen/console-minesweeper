@@ -14,16 +14,16 @@ Install on your machine using CMake in your preferred way.
 
 
 #### Random gameplay example:  
-![Random gameplay example](/Screenshots/MinesweeperCapture1.JPG "Random example")
+![Random gameplay example](/screenshots/MinesweeperCapture1.JPG "Random example")
 
 #### Start of a game:
-![Start of a game](/Screenshots/MinesweeperCapture3.JPG?raw=true "Start of a game")
+![Start of a game](/screenshots/MinesweeperCapture3.JPG "Start of a game")
 
 #### Example of progress after first move:
-![Example of progress after first move](/Screenshots/MinesweeperCapture2.JPG?raw=true "Example of first move")
+![Example of progress after first move](/screenshots/MinesweeperCapture2.JPG "Example of first move")
 
 #### New game options:
-![New game options](/Screenshots/MinesweeperCapture4.JPG?raw=true "New game")
+![New game options](/screenshots/MinesweeperCapture4.JPG "New game")
 
 ---
 
