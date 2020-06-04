@@ -1,0 +1,3 @@
+[submodule "extern/minesweeper"]
+	path = extern/minesweeper
+	url = https://github.com/TimiMakkonen/minesweeper

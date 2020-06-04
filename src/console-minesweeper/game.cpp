@@ -5,10 +5,16 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "Game.h"
-#include "Grid.h"
+#include <console-minesweeper/game.h>
+#include <minesweeper/Grid.h>
 
-namespace Minesweeper {
+namespace console_minesweeper {
+
+	Game::Game(Minesweeper::IRandom* random) : random(random) {
+
+		// setting static IRandom class to the Grid
+		Minesweeper::Grid::setDefaultRandom(this->random); // remember to add nullptr check after initialising grid!
+	}
 
 	void Game::run() {
 
@@ -283,12 +289,12 @@ namespace Minesweeper {
 				inputNumOfMines = inputStringToInt(numOfMinesStr);
 				
 				// check number of mines is within grid limits
-				if (inputNumOfMines > Grid::maxNumOfMines(this->gridHeight, this->gridWidth) 
-							|| inputNumOfMines < Grid::minNumOfMines(this->gridHeight, this->gridWidth)) {
+				if (inputNumOfMines > Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) 
+							|| inputNumOfMines < Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth)) {
 
 					std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
-						<< Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
-						<< Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
+						<< Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+						<< Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
 				}
 				else {
 					this->numOfMines = inputNumOfMines;
@@ -315,14 +321,14 @@ namespace Minesweeper {
 		bool validNumOfMinesChosen = false;
 		while (!validNumOfMinesChosen) {
 			try {
-				currentGrid = std::make_unique<Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
+				currentGrid = std::make_unique<Minesweeper::Grid>(this->gridHeight, this->gridWidth, this->numOfMines);
 
 				validNumOfMinesChosen = true;
 			}
 			catch (const std::out_of_range&) {
 				std::cout << "Too many or not enough mines! Choose again: (Choose a whole number between "
-					<< Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
-					<< Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
+					<< Minesweeper::Grid::minNumOfMines(this->gridHeight, this->gridWidth) << " and "
+					<< Minesweeper::Grid::maxNumOfMines(this->gridHeight, this->gridWidth) << " )" << std::endl;
 				this->chooseNumOfMines(false);
 			}
 		}
@@ -448,7 +454,7 @@ namespace Minesweeper {
 	// to transfer input string of coordinates into coordinates for the program (return false if not able to do this)
 	bool Game::inputToCoordinates(std::string userInput, int& chosenX, int& chosenY, bool& wantToMarkInput) const {
 
-		int inputLength = userInput.length();
+		size_t inputLength = userInput.length();
 
 
 		// to capitalise input

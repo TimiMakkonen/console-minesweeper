@@ -1,13 +1,12 @@
 # Basic Minesweeper game on console
 
-The purpose of this program is to see/show/test if I can program a minesweeper game on my own.
+Console version of Minesweeper game written in C++ utilising [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 7.0.0.
 
 ---
 
-### Note:
+### How to use:
 
-I have made sure not to look up codes of any other minesweeper programs prior making this program. Hence this program and the methods used in it to make it work are all mostly 'original'.
-Throughout making this program, I have only googled some methods, good practices, algorithms and syntax to make things work the way I want them to.
+Install on your machine using CMake in your preferred way.
 
 ---
 
@@ -29,6 +28,17 @@ Throughout making this program, I have only googled some methods, good practices
 ---
 
 ### Version History:
+
+#### Version 7.0.0:
+
+* Separated original Minesweeper game (on console) into:
+	* ['minesweeper'](https://github.com/TimiMakkonen/minesweeper) (game library) and
+	* 'console-minesweeper' (console version of the game which uses the aforementioned library).
+* Turned VS solution into CMake app which uses minesweeper library.
+	* Added '(google)testing'. (Not implemented yet.)
+* Changed file naming convention from 'PascalCase' to 'snake_case'.
+* Changed namespace naming convention from 'PascalCase' to 'lowercase'.
+* Uses [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 7.0.0.
 
 #### Version 6.1.1:
 
@@ -116,4 +126,5 @@ Initial version of the game. Mostly in working condition.
 * Add an option to add mines by percentage, not by quantity.
 * Add an option to choose between 'normal' and 'condensed' grid.
 * Change solution screen. (Does not properly work with large grids atm.)
-
+* Add tests.
+* Add proper documentation.

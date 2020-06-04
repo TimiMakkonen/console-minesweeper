@@ -1,12 +1,14 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef CONSOLE_MINESWEEPER_GAME_H
+#define CONSOLE_MINESWEEPER_GAME_H
 
 #include <string>
 #include <memory>
+#include <vector> //delete after library fix TODO
 
-#include "Grid.h"
+#include <minesweeper/IRandom.h>
+#include <minesweeper/Grid.h>
 
-namespace Minesweeper {
+namespace console_minesweeper {
 
 	class Game {
 	private:
@@ -23,10 +25,11 @@ namespace Minesweeper {
 		const char NOT_VISIBLE_SYMBOL = ' ';
 		const char ERROR_SYMBOL = 'E';
 
+		Minesweeper::IRandom* random;
 		int gridWidth;
 		int gridHeight;
 		int numOfMines;
-		std::unique_ptr<Grid> currentGrid = nullptr;
+		std::unique_ptr<Minesweeper::Grid> currentGrid = nullptr;
 
 		enum class Options {
 			QUIT,
@@ -78,10 +81,12 @@ namespace Minesweeper {
 
 	public:
 
+		Game(Minesweeper::IRandom* random);
+
 		void run();
 
 	};
 
 }
 
-#endif
+#endif // CONSOLE_MINESWEEPER_GAME_H
