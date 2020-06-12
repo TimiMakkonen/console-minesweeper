@@ -42,8 +42,8 @@ Then you can install this game on your machine using CMake in your preferred way
 
 ### Version 7.1.1
 
-* Updated application to use [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 8.0.0.
-* Slightly edited 'README.MD'.
+* Updated application to use [Minesweeper game library](https://github.com/TimiMakkonen/minesweeper) version 8.1.0.
+* Slightly edited 'README.md'.
 
 ### Version 7.1.0
 
