@@ -23,7 +23,7 @@ set(SOURCE_LIST
 
 
 # Make an automatic library - will be static or dynamic based on user setting
-add_library(${LIBRARY_NAME}
+add_library("${LIBRARY_NAME}"
             ${HEADER_LIST}
             ${PRIVATE_HEADER_LIST}
             ${SOURCE_LIST}
